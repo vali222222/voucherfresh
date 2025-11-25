@@ -38,7 +38,7 @@ const Index = () => {
     {
       logo: appleLogo,
       brand: "Apple",
-      offer: "Students Only - 95% Off Your Order",
+      offer: "Students Only - 85% Off Your Order",
       usedToday: 198,
       timeLeft: 13,
     },
