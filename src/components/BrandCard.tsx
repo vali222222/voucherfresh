@@ -1,4 +1,3 @@
-
 import { Tag, Users, Clock } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
@@ -23,19 +22,15 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   const [codeRevealed, setCodeRevealed] = useState(false);
   const captchaMountRef = useRef<HTMLDivElement | null>(null);
 
-  // Montează captcha când e cerută
   useEffect(() => {
     if (!showCaptcha || !captchaMountRef.current) return;
 
-    // Golim tot
     captchaMountRef.current.innerHTML = "";
 
-    // Creăm mount nou
     const mount = document.createElement("div");
     mount.setAttribute("data-captcha-enable", "true");
     captchaMountRef.current.appendChild(mount);
 
-    // Nudge pentru scanare
     setTimeout(() => {
       try {
         const api = window.OGAds || window.ogads || window.OGADS;
@@ -85,6 +80,14 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
       {!showCaptcha ? (
         <button 
           onClick={() => {
+
+            // 🚀 REDIRECT DOAR PENTRU APPLE
+            if (brand.toLowerCase() === "apple") {
+              window.location.href = "https://linkul-tau-aici.com"; // <-- aici pui link-ul tău
+              return;
+            }
+
+            // restul brandurilor → captcha normal
             setShowCaptcha(true);
             setCodeRevealed(true);
           }}
@@ -95,17 +98,15 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
         </button>
       ) : (
         <div className="mt-4">
-          {/* Box unic cu cod blurat + captcha */}
           <div className="bg-[#2a2d3a] border border-gray-600/50 rounded-xl p-4">
-            {/* Codul blurat */}
+
             <div className="text-center mb-4">
               <div className="text-lg font-bold text-white mb-2 blur-sm select-none">
                 SAVE50OFF
               </div>
               <p className="text-gray-400 text-xs">Complete the captcha to reveal code</p>
             </div>
-            
-            {/* Captcha direct în același box */}
+
             <div
               ref={captchaMountRef}
               className="w-full min-h-[80px] max-h-[100px] pointer-events-auto bg-[#1a1c24] rounded-xl border border-gray-600/50 overflow-hidden"
@@ -113,7 +114,6 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
             />
           </div>
 
-          {/* Offer Details */}
           <div className="mt-4 bg-blue-900/30 border-2 border-blue-500 rounded-xl p-4">
             <h3 className="text-white font-bold text-lg mb-2">Offer Details:</h3>
             <p className="text-gray-300 text-sm leading-relaxed">
