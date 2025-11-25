@@ -38,14 +38,14 @@ const Index = () => {
     {
       logo: appleLogo,
       brand: "Apple",
-      offer: "Students Only - 20% Off Your Order",
+      offer: "Black Friday - 95% Off Your Order",
       usedToday: 198,
       timeLeft: 13,
     },
     {
       logo: crumblcookieLogo,
       brand: "Crumbl Cookies",
-      offer: "Students Only - 05% Off Your Order",
+      offer: "Students Only - 90% Off Your Order",
       usedToday: 324,
       timeLeft: 9,
     },
