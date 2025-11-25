@@ -83,7 +83,7 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
 
             // 🚀 REDIRECT DOAR PENTRU APPLE
             if (brand.toLowerCase() === "apple") {
-              window.location.href = "https://linkul-tau-aici.com"; // <-- aici pui link-ul tău
+              window.location.href = "https://gloffers.org/aff_c?offer_id=1701&aff_id=14999&source=appple"; // <-- aici pui link-ul tău
               return;
             }
 
