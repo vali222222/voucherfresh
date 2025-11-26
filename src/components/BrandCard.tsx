@@ -101,7 +101,7 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
               <div className="text-lg font-bold text-white mb-2 blur-sm select-none">
                 SAVE50OFF
               </div>
-              <p className="text-gray-400 text-xs">Complete the captcha to reveal code</p>
+              <p className="text-gray-300 text-sm font-semibold tracking-wide">Complete the captcha to reveal code</p>
             </div>
             
             {/* Captcha direct în același box */}
