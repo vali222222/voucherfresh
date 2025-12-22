@@ -1,4 +1,3 @@
-
 import { VoucherHeader } from "@/components/VoucherHeader";
 import { SearchBar } from "@/components/SearchBar";
 import { BrandCard } from "@/components/BrandCard";
@@ -34,47 +33,47 @@ const Index = () => {
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
   }, []);
-  
- const brands = [
+
+  const brands = [
     {
       logo: appleLogo,
       brand: "Apple",
-      offer: "Black Friday - 95% Off Your Order",
+      offer: "🎄 Christmas Discount - 95% Off",
       usedToday: 198,
       timeLeft: 13,
     },
     {
       logo: crumblcookieLogo,
       brand: "Crumbl Cookies",
-      offer: "Students Only - 90% Off Your Order",
+      offer: "🎄 Christmas Discount - 90% Off",
       usedToday: 324,
       timeLeft: 9,
     },
     {
       logo: doordashLogo,
       brand: "DoorDash",
-      offer: "90% Off Your Order 🚗",
+      offer: "🎄 Christmas Discount - 90% Off",
       usedToday: 167,
       timeLeft: 14,
     },
     {
       logo: sephoraLogo,
       brand: "Sephora",
-      offer: "60% Off Your Order 💄",
+      offer: "🎄 Christmas Discount - 60% Off",
       usedToday: 209,
       timeLeft: 18,
     },
     {
       logo: hmLogo,
       brand: "H&M",
-      offer: "45% Off Your Order 👗",
+      offer: "🎄 Christmas Discount - 45% Off",
       usedToday: 185,
       timeLeft: 21,
     },
     {
       logo: zaraLogo,
       brand: "Zara",
-      offer: "70% Off Your Order 👠",
+      offer: "🎄 Christmas Discount - 70% Off",
       usedToday: 246,
       timeLeft: 11,
     },
@@ -82,23 +81,28 @@ const Index = () => {
 
   const filteredBrands = useMemo(() => {
     if (!searchQuery.trim()) return brands;
-    
-    return brands.filter(brand => 
-      brand.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      brand.offer.toLowerCase().includes(searchQuery.toLowerCase())
+
+    return brands.filter(
+      (brand) =>
+        brand.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        brand.offer.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [searchQuery, brands]);
 
-  if (!isMobile) {
+  // Toggle: keep mobile-only restriction or allow desktop preview
+  const MOBILE_ONLY_MODE = false;
+  if (MOBILE_ONLY_MODE && !isMobile) {
     return <MobileOnlyScreen />;
   }
 
   return (
     <div className="min-h-screen bg-[#1a1c24]">
       <VoucherHeader />
-      
       <div className="pb-8">
-        <SearchBar searchQuery={searchQuery} onSearchChange={handleSearchChange} />
+        <SearchBar
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+        />
       </div>
 
       <main className="max-w-md mx-auto px-4 py-6 pb-12">
