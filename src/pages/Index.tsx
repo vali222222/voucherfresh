@@ -1,10 +1,10 @@
+
 import { VoucherHeader } from "@/components/VoucherHeader";
 import { SearchBar } from "@/components/SearchBar";
 import { BrandCard } from "@/components/BrandCard";
 import { Footer } from "@/components/Footer";
 import { MobileOnlyScreen } from "@/components/MobileOnlyScreen";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ChristmasTheme, CHRISTMAS_MODE } from "@/components/ChristmasTheme";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { preloadImages } from "@/utils/performance";
 import crumblcookieLogo from "@/assets/crumblcookies-logo.png";
@@ -39,42 +39,42 @@ const Index = () => {
     {
       logo: appleLogo,
       brand: "Apple",
-      offer: "🎄 Christmas Discount - 95% Off",
+      offer: "Black Friday - 95% Off Your Order",
       usedToday: 198,
       timeLeft: 13,
     },
     {
       logo: crumblcookieLogo,
       brand: "Crumbl Cookies",
-      offer: "🎄 Christmas Discount - 90% Off",
+      offer: "Students Only - 90% Off Your Order",
       usedToday: 324,
       timeLeft: 9,
     },
     {
       logo: doordashLogo,
       brand: "DoorDash",
-      offer: "🎄 Christmas Discount - 90% Off",
+      offer: "90% Off Your Order 🚗",
       usedToday: 167,
       timeLeft: 14,
     },
     {
       logo: sephoraLogo,
       brand: "Sephora",
-      offer: "🎄 Christmas Discount - 60% Off",
+      offer: "60% Off Your Order 💄",
       usedToday: 209,
       timeLeft: 18,
     },
     {
       logo: hmLogo,
       brand: "H&M",
-      offer: "🎄 Christmas Discount - 45% Off",
+      offer: "45% Off Your Order 👗",
       usedToday: 185,
       timeLeft: 21,
     },
     {
       logo: zaraLogo,
       brand: "Zara",
-      offer: "🎄 Christmas Discount - 70% Off",
+      offer: "70% Off Your Order 👠",
       usedToday: 246,
       timeLeft: 11,
     },
@@ -89,16 +89,14 @@ const Index = () => {
     );
   }, [searchQuery, brands]);
 
-  // Toggle: keep mobile-only restriction or allow desktop preview
-  const MOBILE_ONLY_MODE = false;
-  if (MOBILE_ONLY_MODE && !isMobile) {
+  if (!isMobile) {
     return <MobileOnlyScreen />;
   }
 
   return (
     <div className="min-h-screen bg-[#1a1c24]">
-      {CHRISTMAS_MODE && <ChristmasTheme />}
       <VoucherHeader />
+      
       <div className="pb-8">
         <SearchBar searchQuery={searchQuery} onSearchChange={handleSearchChange} />
       </div>
