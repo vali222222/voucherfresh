@@ -68,8 +68,8 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   }, [showCaptcha]);
 
   return (
-    /* ✅ GOLD border + soft glow on ALL brand cards */
-    <div className="bg-[#212532] card-gold rounded-xl p-4 transition-all duration-300">
+    /* ✅ Clean frosted border for ALL cards */
+    <div className="card-frost rounded-xl p-4 transition-all duration-300">
       <div className="flex items-start gap-3 mb-4">
         <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
           <img src={logo} alt={`${brand} logo`} className="w-full h-full object-cover" />
@@ -121,8 +121,8 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
             />
           </div>
 
-          {/* ✅ Offer Details: GREEN theme + green translucent background */}
-          <div className="mt-4 rounded-xl p-4 details-green">
+          {/* ✅ Offer Details: frosted + tiny green tint */}
+          <div className="mt-4 rounded-xl p-4 details-frost">
             <h3 className="text-white font-bold text-lg mb-2">
               <span className="text-neon-green">Offer Details:</span>
             </h3>
