@@ -68,8 +68,8 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   }, [showCaptcha]);
 
   return (
-    // ✅ Glow verde mereu pe cardul principal
-    <div className="bg-[#212532] neon-modal rounded-xl p-4 transition-all duration-300">
+    /* ✅ GOLD border + soft glow on ALL brand cards */
+    <div className="bg-[#212532] card-gold rounded-xl p-4 transition-all duration-300">
       <div className="flex items-start gap-3 mb-4">
         <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
           <img src={logo} alt={`${brand} logo`} className="w-full h-full object-cover" />
@@ -105,7 +105,7 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
         </button>
       ) : (
         <div className="mt-4">
-          {/* Box cu captcha (poți pune și aici neon-modal dacă vrei) */}
+          {/* Box unic cu cod blurat + captcha */}
           <div className="bg-[#2a2d3a] border border-gray-600/50 rounded-xl p-4">
             <div className="text-center mb-4">
               <div className="text-lg font-bold text-white mb-2 blur-sm select-none">SAVE50OFF</div>
@@ -121,8 +121,11 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
             />
           </div>
 
-          <div className="mt-4 bg-blue-900/30 border-2 border-blue-500 rounded-xl p-4">
-            <h3 className="text-white font-bold text-lg mb-2">Offer Details:</h3>
+          {/* ✅ Offer Details: GREEN theme (no blue) */}
+          <div className="mt-4 rounded-xl p-4 details-green">
+            <h3 className="text-white font-bold text-lg mb-2">
+              <span className="text-neon-green">Offer Details:</span>
+            </h3>
             <p className="text-gray-300 text-sm leading-relaxed">
               Apply this discount code when you checkout to get {offer.toLowerCase()} your {brand} purchase and
               receive immediate savings on various products.
