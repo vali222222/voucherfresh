@@ -34,50 +34,51 @@ const Index = () => {
     setSearchQuery(query);
   }, []);
 
-  const brands = [
-  {
-    logo: appleLogo,
-    brand: "Apple",
-    offer: "🎄 Christmas Discount - 95% Off",
-    usedToday: 198,
-    timeLeft: 13,
-  },
-  {
-    logo: doordashLogo,
-    brand: "DoorDash",
-    offer: "🎄 Christmas Discount - 90% Off",
-    usedToday: 167,
-    timeLeft: 14,
-  },
-  {
-    logo: crumblcookieLogo,
-    brand: "Crumbl Cookies",
-    offer: "🎄 Christmas Discount - 90% Off",
-    usedToday: 324,
-    timeLeft: 9,
-  },
-  {
-    logo: sephoraLogo,
-    brand: "Sephora",
-    offer: "🎄 Christmas Discount - 60% Off",
-    usedToday: 209,
-    timeLeft: 18,
-  },
-  {
-    logo: hmLogo,
-    brand: "H&M",
-    offer: "🎄 Christmas Discount - 45% Off",
-    usedToday: 185,
-    timeLeft: 21,
-  },
-  {
-    logo: zaraLogo,
-    brand: "Zara",
-    offer: "🎄 Christmas Discount - 70% Off",
-    usedToday: 246,
-    timeLeft: 11,
-  },
-];
+ const brands = [
+    {
+      logo: costcoLogo,
+      brand: "Costco",
+      offer: "🔥 $750 Giftcard",
+      usedToday: 185,
+      timeLeft: 12,
+    },
+    {
+      logo: appleLogo,
+      brand: "Apple",
+      offer: "⚡ Exclusive offer — Up to 95% Off",
+      usedToday: 198,
+      timeLeft: 13,
+    },
+    {
+      logo: doordashLogo,
+      brand: "DoorDash",
+      offer: "🍔 Hot deal — Up to 90% Off",
+      usedToday: 167,
+      timeLeft: 14,
+    },
+    {
+      logo: crumblcookieLogo,
+      brand: "Crumbl Cookies",
+      offer: "🍪 Sweet deal — Up to 90% Off",
+      usedToday: 324,
+      timeLeft: 9,
+    },
+    {
+      logo: sephoraLogo,
+      brand: "Sephora",
+      offer: "💄 Beauty picks — Up to 60% Off",
+      usedToday: 209,
+      timeLeft: 18,
+    },
+    {
+      logo: zaraLogo,
+      brand: "Zara",
+      offer: "🛍️ Style drop — Up to 70% Off",
+      usedToday: 246,
+      timeLeft: 11,
+    },
+  ];
+
 
   const filteredBrands = useMemo(() => {
     if (!searchQuery.trim()) return brands;
