@@ -10,7 +10,7 @@ import crumblcookieLogo from "@/assets/crumblcookies-logo.png";
 import appleLogo from "@/assets/apple-logo.png";
 import doordashLogo from "@/assets/doordash-logo.png";
 import sephoraLogo from "@/assets/sephora-logo.png";
-import hmLogo from "@/assets/hm-logo.png";
+import costcoLogo from "@/assets/costco-logo.png";
 import zaraLogo from "@/assets/zara-logo.png";
 
 const Index = () => {
@@ -24,7 +24,7 @@ const Index = () => {
       appleLogo,
       doordashLogo,
       sephoraLogo,
-      hmLogo,
+      costcoLogo,
       zaraLogo,
     ];
     preloadImages(criticalImages);
