@@ -68,8 +68,8 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   }, [showCaptcha]);
 
   return (
-    /* ✅ Clean frosted border for ALL cards */
-    <div className="card-frost rounded-xl p-4 transition-all duration-300">
+    /* ✅ Frosted card + subtle breathe (always on) */
+    <div className="card-frost card-breathe rounded-xl p-4 transition-all duration-300">
       <div className="flex items-start gap-3 mb-4">
         <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
           <img src={logo} alt={`${brand} logo`} className="w-full h-full object-cover" />
