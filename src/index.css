@@ -111,7 +111,7 @@ All colors MUST be HSL.
   }
 }
 
-/* ✅ Clean frosted look */
+/* ✅ Clean frosted look + subtle breathing */
 @layer utilities {
   /* Main brand card: subtle white/gray border + soft shadow */
   .card-frost {
@@ -135,4 +135,27 @@ All colors MUST be HSL.
       hsl(var(--background) / 0.55) 65%
     ) !important;
   }
-}
+
+  /* ✅ Subtle breathing animation for cards */
+  @keyframes card-breathe {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-1px) scale(1.006);
+    }
+  }
+
+  .card-breathe {
+    animation: card-breathe 4.8s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  /* Respect users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .card-breathe {
+      animation: none !important;
+    }
+  }
+ }
