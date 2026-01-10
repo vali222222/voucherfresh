@@ -1,5 +1,5 @@
 import { Tag, Users, Clock } from "lucide-react";
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 
 declare global {
   interface Window {
@@ -19,25 +19,43 @@ interface BrandCardProps {
 
 export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCardProps) => {
   const [showCaptcha, setShowCaptcha] = useState(false);
-  const [codeRevealed, setCodeRevealed] = useState(false);
   const captchaMountRef = useRef<HTMLDivElement | null>(null);
 
-  // ✅ Detectează Costco (acceptă și "Costco Wholesale" etc.)
+  // ✅ Detectează Costco (merge și pentru "Costco Wholesale" etc.)
   const isCostco = useMemo(() => brand.toLowerCase().includes("costco"), [brand]);
+
+  /**
+   * =========================
+   * ✅ COSTCO SETTINGS (EDIT HERE)
+   * =========================
+   * 1) Pune aici link-ul unde vrei să trimiți userul când apasă pe Costco.
+   * 2) Dacă vrei să revii la captcha și pentru Costco, schimbă COSTCO_SKIP_CAPTCHA în false.
+   */
+  const COSTCO_REDIRECT_URL = "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco"; // <-- SCHIMBĂ AICI
+  const COSTCO_SKIP_CAPTCHA = true; // <-- dacă vrei iar captcha la Costco, pune false
+
+  const handlePrimaryAction = useCallback(() => {
+    // ✅ Costco: redirect direct (fără captcha)
+    if (isCostco && COSTCO_SKIP_CAPTCHA) {
+      // deschide în tab nou (mai safe)
+      window.open(COSTCO_REDIRECT_URL, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // ✅ Restul brandurilor: flow normal cu captcha
+    setShowCaptcha(true);
+  }, [isCostco, COSTCO_SKIP_CAPTCHA, COSTCO_REDIRECT_URL]);
 
   // Montează captcha când e cerută
   useEffect(() => {
     if (!showCaptcha || !captchaMountRef.current) return;
 
-    // Golim tot
     captchaMountRef.current.innerHTML = "";
 
-    // Creăm mount nou
     const mount = document.createElement("div");
     mount.setAttribute("data-captcha-enable", "true");
     captchaMountRef.current.appendChild(mount);
 
-    // Nudge pentru scanare
     setTimeout(() => {
       try {
         const api = window.OGAds || window.ogads || window.OGADS;
@@ -78,22 +96,16 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
 
       {!showCaptcha ? (
         <button
-          onClick={() => {
-            setShowCaptcha(true);
-            setCodeRevealed(true);
-          }}
+          onClick={handlePrimaryAction}
           className="w-full bg-neon-green hover:bg-neon-green/90 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:scale-[1.02] shadow-neon-green/20"
         >
           <Tag className="w-4 h-4" />
-
-          {/* ✅ Doar la Costco schimbă textul */}
           <span className="text-sm">{isCostco ? "Get Giftcard" : "Get Coupon Code"}</span>
         </button>
       ) : (
         <div className="mt-4">
           {/* Box unic cu cod blurat + captcha */}
           <div className="bg-[#2a2d3a] border border-gray-600/50 rounded-xl p-4">
-            {/* Codul blurat */}
             <div className="text-center mb-4">
               <div className="text-lg font-bold text-white mb-2 blur-sm select-none">SAVE50OFF</div>
               <p className="text-gray-300 text-sm font-semibold tracking-wide">
@@ -101,7 +113,6 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
               </p>
             </div>
 
-            {/* Captcha direct în același box */}
             <div
               ref={captchaMountRef}
               className="w-full min-h-[80px] max-h-[100px] pointer-events-auto bg-[#1a1c24] rounded-xl border border-gray-600/50 overflow-hidden"
@@ -109,7 +120,6 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
             />
           </div>
 
-          {/* Offer Details */}
           <div className="mt-4 bg-blue-900/30 border-2 border-blue-500 rounded-xl p-4">
             <h3 className="text-white font-bold text-lg mb-2">Offer Details:</h3>
             <p className="text-gray-300 text-sm leading-relaxed">
