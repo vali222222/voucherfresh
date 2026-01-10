@@ -55,9 +55,9 @@ All colors MUST be HSL.
     --badge-purple: 273 100% 25%;
     --badge-purple-text: 273 100% 70%;
 
-    /* ✅ Neon modal glow */
-    --neon-modal-border: 120 100% 55%;
-    --neon-modal-glow: 120 100% 55%;
+    /* ✅ Accents for borders/details (HSL) */
+    --gold-accent: 45 100% 60%;
+    --green-accent: 120 100% 55%;
   }
 
   .dark {
@@ -97,9 +97,9 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* ✅ Dark mode neon modal glow */
-    --neon-modal-border: 120 100% 55%;
-    --neon-modal-glow: 120 100% 55%;
+    /* ✅ keep same accents in dark */
+    --gold-accent: 45 100% 60%;
+    --green-accent: 120 100% 55%;
   }
 }
 
@@ -113,16 +113,24 @@ All colors MUST be HSL.
   }
 }
 
-/* ✅ IMPORTANT: pune ca utility + !important ca să NU fie suprascris de shadow-* */
+/* ✅ GOLD border for brand cards + GREEN border for Offer Details */
 @layer utilities {
-  .neon-modal {
-    /* soft neon border */
-    border: 1px solid hsl(var(--neon-modal-border) / 0.35) !important;
-
-    /* soft glow */
+  /* Card border: GOLD (soft + premium) */
+  .card-gold {
+    border: 1px solid hsl(var(--gold-accent) / 0.32) !important;
     box-shadow:
-      0 0 0 1px hsl(var(--neon-modal-glow) / 0.12),
-      0 0 10px hsl(var(--neon-modal-glow) / 0.16),
-      0 0 22px hsl(var(--neon-modal-glow) / 0.10) !important;
+      0 0 0 1px hsl(var(--gold-accent) / 0.10),
+      0 0 10px hsl(var(--gold-accent) / 0.10),
+      0 0 18px hsl(var(--gold-accent) / 0.06) !important;
+  }
+
+  /* Offer Details: GREEN (soft neon glow) */
+  .details-green {
+    border: 1px solid hsl(var(--green-accent) / 0.28) !important;
+    box-shadow:
+      0 0 0 1px hsl(var(--green-accent) / 0.10),
+      0 0 10px hsl(var(--green-accent) / 0.12),
+      0 0 18px hsl(var(--green-accent) / 0.08) !important;
+    background: hsl(var(--background) / 0.55);
   }
 }
