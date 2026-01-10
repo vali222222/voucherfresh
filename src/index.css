@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
 All colors MUST be HSL.
 */
 
@@ -46,6 +46,10 @@ All colors MUST be HSL.
     --orange-accent: 37 100% 65%;
     --dark-card: 220 30% 20%;
     --dark-background: 220 25% 12%;
+
+    /* ✅ Neon modal glow (HSL only) */
+    --neon-modal-border: 120 100% 55%;
+    --neon-modal-glow: 120 100% 55%;
 
     /* Badge colors */
     --badge-green: 120 100% 25%;
@@ -92,6 +96,10 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* ✅ Dark mode neon modal glow (poate fi la fel sau mai moale) */
+    --neon-modal-border: 120 100% 55%;
+    --neon-modal-glow: 120 100% 55%;
   }
 }
 
@@ -102,5 +110,16 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* ✅ Reusable neon border + glow class for ALL modals/boxes */
+@layer components {
+  .neon-modal {
+    border: 1px solid hsl(var(--neon-modal-border) / 0.45);
+    box-shadow:
+      0 0 0 1px hsl(var(--neon-modal-glow) / 0.18),
+      0 0 14px hsl(var(--neon-modal-glow) / 0.25),
+      0 0 34px hsl(var(--neon-modal-glow) / 0.16);
   }
 }
