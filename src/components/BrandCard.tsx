@@ -121,12 +121,12 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
             />
           </div>
 
-          {/* ✅ Offer Details: GREEN theme (no blue) */}
+          {/* ✅ Offer Details: GREEN theme + green translucent background */}
           <div className="mt-4 rounded-xl p-4 details-green">
             <h3 className="text-white font-bold text-lg mb-2">
               <span className="text-neon-green">Offer Details:</span>
             </h3>
-            <p className="text-gray-300 text-sm leading-relaxed">
+            <p className="text-gray-200 text-sm leading-relaxed">
               Apply this discount code when you checkout to get {offer.toLowerCase()} your {brand} purchase and
               receive immediate savings on various products.
             </p>
