@@ -55,8 +55,7 @@ All colors MUST be HSL.
     --badge-purple: 273 100% 25%;
     --badge-purple-text: 273 100% 70%;
 
-    /* ✅ Accents for borders/details (HSL) */
-    --gold-accent: 45 100% 60%;
+    /* ✅ Accent for subtle green tint */
     --green-accent: 120 100% 55%;
   }
 
@@ -97,8 +96,7 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* ✅ keep same accents in dark */
-    --gold-accent: 45 100% 60%;
+    /* ✅ keep green tint in dark */
     --green-accent: 120 100% 55%;
   }
 }
@@ -113,30 +111,28 @@ All colors MUST be HSL.
   }
 }
 
-/* ✅ GOLD border for brand cards + GREEN border + tinted background for Offer Details */
+/* ✅ Clean frosted look */
 @layer utilities {
-  /* Card border: GOLD (soft + premium) */
-  .card-gold {
-    border: 1px solid hsl(var(--gold-accent) / 0.32) !important;
+  /* Main brand card: subtle white/gray border + soft shadow */
+  .card-frost {
+    border: 1px solid hsl(0 0% 100% / 0.12) !important;
     box-shadow:
-      0 0 0 1px hsl(var(--gold-accent) / 0.10),
-      0 0 10px hsl(var(--gold-accent) / 0.10),
-      0 0 18px hsl(var(--gold-accent) / 0.06) !important;
+      0 1px 0 hsl(0 0% 100% / 0.05),
+      0 10px 28px hsl(220 25% 6% / 0.55) !important;
+    background: hsl(var(--card) / 0.92) !important;
   }
 
-  /* Offer Details: GREEN (soft neon) + green tinted background */
-  .details-green {
-    border: 1px solid hsl(var(--green-accent) / 0.28) !important;
+  /* Offer Details: same frost + tiny green tint background */
+  .details-frost {
+    border: 1px solid hsl(0 0% 100% / 0.12) !important;
     box-shadow:
-      0 0 0 1px hsl(var(--green-accent) / 0.10),
-      0 0 10px hsl(var(--green-accent) / 0.12),
-      0 0 18px hsl(var(--green-accent) / 0.08) !important;
+      0 1px 0 hsl(0 0% 100% / 0.05),
+      0 10px 28px hsl(220 25% 6% / 0.55) !important;
 
-    /* green tint, still readable */
     background: linear-gradient(
       180deg,
-      hsl(var(--green-accent) / 0.12) 0%,
-      hsl(var(--background) / 0.55) 60%
+      hsl(var(--green-accent) / 0.10) 0%,
+      hsl(var(--background) / 0.55) 65%
     ) !important;
   }
 }
