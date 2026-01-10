@@ -113,7 +113,7 @@ All colors MUST be HSL.
   }
 }
 
-/* ✅ GOLD border for brand cards + GREEN border for Offer Details */
+/* ✅ GOLD border for brand cards + GREEN border + tinted background for Offer Details */
 @layer utilities {
   /* Card border: GOLD (soft + premium) */
   .card-gold {
@@ -124,13 +124,19 @@ All colors MUST be HSL.
       0 0 18px hsl(var(--gold-accent) / 0.06) !important;
   }
 
-  /* Offer Details: GREEN (soft neon glow) */
+  /* Offer Details: GREEN (soft neon) + green tinted background */
   .details-green {
     border: 1px solid hsl(var(--green-accent) / 0.28) !important;
     box-shadow:
       0 0 0 1px hsl(var(--green-accent) / 0.10),
       0 0 10px hsl(var(--green-accent) / 0.12),
       0 0 18px hsl(var(--green-accent) / 0.08) !important;
-    background: hsl(var(--background) / 0.55);
+
+    /* green tint, still readable */
+    background: linear-gradient(
+      180deg,
+      hsl(var(--green-accent) / 0.12) 0%,
+      hsl(var(--background) / 0.55) 60%
+    ) !important;
   }
 }
