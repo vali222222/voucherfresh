@@ -21,7 +21,6 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   const [showCaptcha, setShowCaptcha] = useState(false);
   const captchaMountRef = useRef<HTMLDivElement | null>(null);
 
-  // ✅ Detectează Costco (merge și pentru "Costco Wholesale" etc.)
   const isCostco = useMemo(() => brand.toLowerCase().includes("costco"), [brand]);
 
   /**
@@ -31,22 +30,19 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
    * 1) Pune aici link-ul unde vrei să trimiți userul când apasă pe Costco.
    * 2) Dacă vrei să revii la captcha și pentru Costco, schimbă COSTCO_SKIP_CAPTCHA în false.
    */
-  const COSTCO_REDIRECT_URL = "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco"; // <-- SCHIMBĂ AICI
+  const COSTCO_REDIRECT_URL =
+    "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco"; // <-- SCHIMBĂ AICI
   const COSTCO_SKIP_CAPTCHA = true; // <-- dacă vrei iar captcha la Costco, pune false
 
   const handlePrimaryAction = useCallback(() => {
-    // ✅ Costco: redirect direct (fără captcha)
     if (isCostco && COSTCO_SKIP_CAPTCHA) {
-      // deschide în tab nou (mai safe)
       window.open(COSTCO_REDIRECT_URL, "_blank", "noopener,noreferrer");
       return;
     }
 
-    // ✅ Restul brandurilor: flow normal cu captcha
     setShowCaptcha(true);
   }, [isCostco, COSTCO_SKIP_CAPTCHA, COSTCO_REDIRECT_URL]);
 
-  // Montează captcha când e cerută
   useEffect(() => {
     if (!showCaptcha || !captchaMountRef.current) return;
 
@@ -68,7 +64,8 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   }, [showCaptcha]);
 
   return (
-    <div className="bg-[#212532] border border-gray-600/50 rounded-xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:border-neon-green/30 ring-1 ring-gray-500/20">
+    // ✅ AICI: glow verde pe cardul principal (toate brandurile)
+    <div className="bg-[#212532] neon-modal rounded-xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 ring-1 ring-gray-500/10">
       <div className="flex items-start gap-3 mb-4">
         <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
           <img src={logo} alt={`${brand} logo`} className="w-full h-full object-cover" />
@@ -104,7 +101,7 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
         </button>
       ) : (
         <div className="mt-4">
-          {/* Box unic cu cod blurat + captcha */}
+          {/* (captcha box) - îl poți lăsa cum era sau îi pui și lui neon-modal dacă vrei */}
           <div className="bg-[#2a2d3a] border border-gray-600/50 rounded-xl p-4">
             <div className="text-center mb-4">
               <div className="text-lg font-bold text-white mb-2 blur-sm select-none">SAVE50OFF</div>
