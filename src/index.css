@@ -116,10 +116,13 @@ All colors MUST be HSL.
 /* ✅ IMPORTANT: pune ca utility + !important ca să NU fie suprascris de shadow-* */
 @layer utilities {
   .neon-modal {
-    border: 1px solid hsl(var(--neon-modal-border) / 0.55) !important;
+    /* soft neon border */
+    border: 1px solid hsl(var(--neon-modal-border) / 0.35) !important;
+
+    /* soft glow */
     box-shadow:
-      0 0 0 1px hsl(var(--neon-modal-glow) / 0.22),
-      0 0 16px hsl(var(--neon-modal-glow) / 0.30),
-      0 0 42px hsl(var(--neon-modal-glow) / 0.20) !important;
+      0 0 0 1px hsl(var(--neon-modal-glow) / 0.12),
+      0 0 10px hsl(var(--neon-modal-glow) / 0.16),
+      0 0 22px hsl(var(--neon-modal-glow) / 0.10) !important;
   }
 }
