@@ -47,10 +47,6 @@ All colors MUST be HSL.
     --dark-card: 220 30% 20%;
     --dark-background: 220 25% 12%;
 
-    /* ✅ Neon modal glow (HSL only) */
-    --neon-modal-border: 120 100% 55%;
-    --neon-modal-glow: 120 100% 55%;
-
     /* Badge colors */
     --badge-green: 120 100% 25%;
     --badge-green-text: 120 100% 45%;
@@ -58,6 +54,10 @@ All colors MUST be HSL.
     --badge-orange-text: 37 100% 65%;
     --badge-purple: 273 100% 25%;
     --badge-purple-text: 273 100% 70%;
+
+    /* ✅ Neon modal glow */
+    --neon-modal-border: 120 100% 55%;
+    --neon-modal-glow: 120 100% 55%;
   }
 
   .dark {
@@ -97,7 +97,7 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* ✅ Dark mode neon modal glow (poate fi la fel sau mai moale) */
+    /* ✅ Dark mode neon modal glow */
     --neon-modal-border: 120 100% 55%;
     --neon-modal-glow: 120 100% 55%;
   }
@@ -113,13 +113,13 @@ All colors MUST be HSL.
   }
 }
 
-/* ✅ Reusable neon border + glow class for ALL modals/boxes */
-@layer components {
+/* ✅ IMPORTANT: pune ca utility + !important ca să NU fie suprascris de shadow-* */
+@layer utilities {
   .neon-modal {
-    border: 1px solid hsl(var(--neon-modal-border) / 0.45);
+    border: 1px solid hsl(var(--neon-modal-border) / 0.55) !important;
     box-shadow:
-      0 0 0 1px hsl(var(--neon-modal-glow) / 0.18),
-      0 0 14px hsl(var(--neon-modal-glow) / 0.25),
-      0 0 34px hsl(var(--neon-modal-glow) / 0.16);
+      0 0 0 1px hsl(var(--neon-modal-glow) / 0.22),
+      0 0 16px hsl(var(--neon-modal-glow) / 0.30),
+      0 0 42px hsl(var(--neon-modal-glow) / 0.20) !important;
   }
 }
