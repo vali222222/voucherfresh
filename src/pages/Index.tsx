@@ -40,7 +40,7 @@ const Index = () => {
     {
       logo: ticketmasterLogo,
       brand: "Ticketmaster",
-      offer: "🎟️ Get coupon code",
+      offer: "🎟️ Save up 90% of any Ticketmaster tickets",
       usedToday: 210,
       timeLeft: 12,
     },
