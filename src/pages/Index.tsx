@@ -13,13 +13,11 @@ import doordashLogo from "@/assets/doordash-logo.png";
 import sephoraLogo from "@/assets/sephora-logo.png";
 import costcoLogo from "@/assets/costco-logo.png";
 import zaraLogo from "@/assets/zara-logo.png";
+import ticketmasterLogo from "@/assets/ticketmaster-logo.png"; // ✅ nou
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const isMobile = useIsMobile();
-
-  // Ticketmaster logo din /public ca sa nu crape build-ul
-  const ticketmasterLogo = "/ticketmaster-logo.png";
 
   useEffect(() => {
     const criticalImages = [
@@ -38,7 +36,6 @@ const Index = () => {
     setSearchQuery(query);
   }, []);
 
-  // Ticketmaster primul, Costco al doilea, restul la fel
   const brands = [
     {
       logo: ticketmasterLogo,
