@@ -15,15 +15,6 @@ import costcoLogo from "@/assets/costco-logo.png";
 import zaraLogo from "@/assets/zara-logo.png";
 import ticketmasterLogo from "@/assets/ticketmaster-logo.png"; // ✅ nou
 
-type BrandItem = {
-  logo: string;
-  brand: string;
-  offer: string;
-  usedToday: number;
-  timeLeft: number;
-  ctaUrl?: string; // ✅ optional: link direct
-};
-
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const isMobile = useIsMobile();
@@ -45,14 +36,13 @@ const Index = () => {
     setSearchQuery(query);
   }, []);
 
-  const brands: BrandItem[] = [
+  const brands = [
     {
       logo: ticketmasterLogo,
       brand: "Ticketmaster",
-      offer: "🔥 Get $1000 Giftcard", // ✅ ca la Costco
+      offer: "🎟️ $1000 Giftcard",
       usedToday: 210,
       timeLeft: 12,
-      ctaUrl: "https://trkio.org/aff_c?offer_id=1326&aff_id=14999&source=ticket", // ✅ direct link
     },
     {
       logo: costcoLogo,
@@ -117,46 +107,21 @@ const Index = () => {
     <div className="min-h-screen bg-[#1a1c24]">
       <VoucherHeader />
       <div className="pb-8">
-        <SearchBar
-          searchQuery={searchQuery}
-          onSearchChange={handleSearchChange}
-        />
+        <SearchBar searchQuery={searchQuery} onSearchChange={handleSearchChange} />
       </div>
 
       <main className="max-w-md mx-auto px-4 py-6 pb-12">
         <div className="space-y-4">
           {filteredBrands.length > 0 ? (
             filteredBrands.map((brand, index) => (
-              // ✅ Interceptăm click-ul ÎNAINTE de BrandCard (capture),
-              // ca să nu mai ruleze niciun flux intern (ex: captcha) pentru Ticketmaster
-              <div
-                key={`${brand.brand}-${index}`}
-                className={brand.ctaUrl ? "cursor-pointer" : undefined}
-                role={brand.ctaUrl ? "link" : undefined}
-                tabIndex={brand.ctaUrl ? 0 : undefined}
-                onClickCapture={(e) => {
-                  if (!brand.ctaUrl) return;
-                  e.preventDefault();
-                  e.stopPropagation();
-                  window.location.href = brand.ctaUrl;
-                }}
-                onKeyDownCapture={(e) => {
-                  if (!brand.ctaUrl) return;
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    window.location.href = brand.ctaUrl;
-                  }
-                }}
-              >
-                <BrandCard
-                  logo={brand.logo}
-                  brand={brand.brand}
-                  offer={brand.offer}
-                  usedToday={brand.usedToday}
-                  timeLeft={brand.timeLeft}
-                />
-              </div>
+              <BrandCard
+                key={index}
+                logo={brand.logo}
+                brand={brand.brand}
+                offer={brand.offer}
+                usedToday={brand.usedToday}
+                timeLeft={brand.timeLeft}
+              />
             ))
           ) : (
             <div className="text-center py-8">
