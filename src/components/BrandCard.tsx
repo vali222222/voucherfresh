@@ -31,8 +31,8 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
    * =========================
    * ✅ COSTCO + TICKETMASTER SETTINGS (EDIT HERE)
    * =========================
-   * Doar Costco + Ticketmaster sar peste captcha și fac redirect.
-   * Restul brandurilor rămân cu captcha (ca înainte).
+   * Doar Costco + Ticketmaster sar peste captcha și fac redirect (dacă setările sunt true).
+   * Restul brandurilor rămân cu captcha.
    */
   const COSTCO_REDIRECT_URL =
     "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco";
@@ -43,13 +43,13 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   const TICKETMASTER_SKIP_CAPTCHA = false;
 
   const handlePrimaryAction = useCallback(() => {
-    // ✅ Costco: redirect direct (fără captcha)
+    // ✅ Costco: redirect direct (fără captcha) dacă e activat
     if (isCostco && COSTCO_SKIP_CAPTCHA) {
       window.open(COSTCO_REDIRECT_URL, "_blank", "noopener,noreferrer");
       return;
     }
 
-    // ✅ Ticketmaster: redirect direct (fără captcha)
+    // ✅ Ticketmaster: redirect direct (fără captcha) dacă e activat
     if (isTicketmaster && TICKETMASTER_SKIP_CAPTCHA) {
       window.open(TICKETMASTER_REDIRECT_URL, "_blank", "noopener,noreferrer");
       return;
@@ -87,7 +87,8 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
     }, 40);
   }, [showCaptcha]);
 
-  const isGiftcardFlow = isCostco || isTicketmaster;
+  // ✅ DOAR Costco = giftcard. Ticketmaster rămâne coupon code.
+  const isGiftcardFlow = isCostco;
 
   return (
     /* ✅ Frosted card + subtle breathe (always on) */
