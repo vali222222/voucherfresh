@@ -47,7 +47,7 @@ const Index = () => {
     {
       logo: costcoLogo,
       brand: "Costco",
-      offer: "🔥 $750 Giftcard",
+      offer: "🎟️ $750 Giftcard",
       usedToday: 185,
       timeLeft: 8,
     },
