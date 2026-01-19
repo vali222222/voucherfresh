@@ -40,23 +40,23 @@ const Index = () => {
     {
       logo: ticketmasterLogo,
       brand: "Ticketmaster",
-      offer: "🎟️ $1000 Giftcard",
+      offer: "Last-Minute Concert Deals — Up to 40% Off",
       usedToday: 210,
-      timeLeft: 12,
+      timeLeft: 11,
     },
     {
       logo: costcoLogo,
       brand: "Costco",
       offer: "🔥 $750 Giftcard",
       usedToday: 185,
-      timeLeft: 12,
+      timeLeft: 8,
     },
     {
       logo: appleLogo,
       brand: "Apple",
       offer: "⚡ Exclusive offer — Up to 95% Off",
       usedToday: 198,
-      timeLeft: 13,
+      timeLeft: 23,
     },
     {
       logo: doordashLogo,
