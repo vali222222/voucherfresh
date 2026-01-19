@@ -17,57 +17,83 @@ interface BrandCardProps {
   timeLeft: number;
 }
 
+// ✅ simple geo cache (ca să nu facă request pentru fiecare card)
+let _countryCodePromise: Promise<string | null> | null = null;
+const getCountryCode = () => {
+  if (_countryCodePromise) return _countryCodePromise;
+
+  _countryCodePromise = fetch("https://ipwho.is/?fields=country_code", {
+    method: "GET",
+  })
+    .then((r) => r.json())
+    .then((data) => (typeof data?.country_code === "string" ? data.country_code : null))
+    .catch(() => null);
+
+  return _countryCodePromise;
+};
+
 export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCardProps) => {
   const [showCaptcha, setShowCaptcha] = useState(false);
   const captchaMountRef = useRef<HTMLDivElement | null>(null);
+
+  // ✅ Geo (default: null -> dacă nu știm țara, mergem pe captcha)
+  const [countryCode, setCountryCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    getCountryCode().then((cc) => {
+      if (!alive) return;
+      setCountryCode(cc);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const isUS = countryCode === "US";
 
   // ✅ Detectează Costco (merge și pentru "Costco Wholesale" etc.)
   const isCostco = useMemo(() => brand.toLowerCase().includes("costco"), [brand]);
 
   // ✅ Detectează Ticketmaster
-  const isTicketmaster = useMemo(
-    () => brand.toLowerCase().includes("ticketmaster"),
-    [brand]
-  );
+  const isTicketmaster = useMemo(() => brand.toLowerCase().includes("ticketmaster"), [brand]);
 
   /**
    * =========================
-   * ✅ COSTCO + TICKETMASTER SETTINGS (EDIT HERE)
+   * ✅ COSTCO + TICKETMASTER SETTINGS
    * =========================
-   * Link-urile unde trimiți userul când apasă pe Costco / Ticketmaster.
-   * Dacă vrei să revii la captcha pentru oricare, pune *_SKIP_CAPTCHA = false.
+   * - Dacă userul e din SUA (US) -> redirect direct la link
+   * - Dacă e UK/GB sau ORICE altă țară -> captcha modal (ca restul)
    */
   const COSTCO_REDIRECT_URL =
-    "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco"; // <-- Costco link
-  const COSTCO_SKIP_CAPTCHA = true;
-
+    "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco";
   const TICKETMASTER_REDIRECT_URL =
-    "https://trkio.org/aff_c?offer_id=1326&aff_id=14999&source=ticket"; // <-- Ticketmaster link
-  const TICKETMASTER_SKIP_CAPTCHA = true;
+    "https://trkio.org/aff_c?offer_id=1326&aff_id=14999&source=ticket";
 
   const handlePrimaryAction = useCallback(() => {
-    // ✅ Costco: redirect direct (fără captcha)
-    if (isCostco && COSTCO_SKIP_CAPTCHA) {
-      window.open(COSTCO_REDIRECT_URL, "_blank", "noopener,noreferrer");
+    // ✅ Costco: SUA -> redirect, în afara SUA -> captcha
+    if (isCostco) {
+      if (isUS) {
+        window.open(COSTCO_REDIRECT_URL, "_blank", "noopener,noreferrer");
+      } else {
+        setShowCaptcha(true);
+      }
       return;
     }
 
-    // ✅ Ticketmaster: redirect direct (fără captcha)
-    if (isTicketmaster && TICKETMASTER_SKIP_CAPTCHA) {
-      window.open(TICKETMASTER_REDIRECT_URL, "_blank", "noopener,noreferrer");
+    // ✅ Ticketmaster: SUA -> redirect, în afara SUA -> captcha
+    if (isTicketmaster) {
+      if (isUS) {
+        window.open(TICKETMASTER_REDIRECT_URL, "_blank", "noopener,noreferrer");
+      } else {
+        setShowCaptcha(true);
+      }
       return;
     }
 
-    // ✅ Restul brandurilor: flow normal cu captcha
+    // ✅ Restul brandurilor: mereu captcha
     setShowCaptcha(true);
-  }, [
-    isCostco,
-    COSTCO_SKIP_CAPTCHA,
-    COSTCO_REDIRECT_URL,
-    isTicketmaster,
-    TICKETMASTER_SKIP_CAPTCHA,
-    TICKETMASTER_REDIRECT_URL,
-  ]);
+  }, [isCostco, isTicketmaster, isUS, COSTCO_REDIRECT_URL, TICKETMASTER_REDIRECT_URL]);
 
   // Montează captcha când e cerută
   useEffect(() => {
@@ -93,7 +119,6 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   const isGiftcardFlow = isCostco || isTicketmaster;
 
   return (
-    /* ✅ Frosted card + subtle breathe (always on) */
     <div className="card-frost card-breathe rounded-xl p-4 transition-all duration-300">
       <div className="flex items-start gap-3 mb-4">
         <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
@@ -130,7 +155,6 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
         </button>
       ) : (
         <div className="mt-4">
-          {/* Box unic cu cod blurat + captcha */}
           <div className="bg-[#2a2d3a] border border-gray-600/50 rounded-xl p-4">
             <div className="text-center mb-4">
               <div className="text-lg font-bold text-white mb-2 blur-sm select-none">SAVE50OFF</div>
@@ -146,7 +170,6 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
             />
           </div>
 
-          {/* ✅ Offer Details: frosted + tiny green tint */}
           <div className="mt-4 rounded-xl p-4 details-frost">
             <h3 className="text-white font-bold text-lg mb-2">
               <span className="text-neon-green">Offer Details:</span>
