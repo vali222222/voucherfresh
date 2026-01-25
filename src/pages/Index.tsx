@@ -13,7 +13,10 @@ import doordashLogo from "@/assets/doordash-logo.png";
 import sephoraLogo from "@/assets/sephora-logo.png";
 import costcoLogo from "@/assets/costco-logo.png";
 import zaraLogo from "@/assets/zara-logo.png";
-import ticketmasterLogo from "@/assets/ticketmaster-logo.png"; // ✅ nou
+import ticketmasterLogo from "@/assets/ticketmaster-logo.png";
+
+// ✅ adaugi tu poza asta după ce o încarci (pune exact numele fișierului aici)
+import targetLogo from "@/assets/target-logo.png";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,7 +24,8 @@ const Index = () => {
 
   useEffect(() => {
     const criticalImages = [
-      ticketmasterLogo,
+      targetLogo, // ✅ Target primul
+      ticketmasterLogo, // ✅ Ticketmaster al doilea
       crumblcookieLogo,
       appleLogo,
       doordashLogo,
@@ -36,7 +40,15 @@ const Index = () => {
     setSearchQuery(query);
   }, []);
 
+  // ✅ Target #1, Ticketmaster #2
   const brands = [
+    {
+      logo: targetLogo,
+      brand: "Target",
+      offer: "🎯 Mega deal — Up to 85% Off",
+      usedToday: 260,
+      timeLeft: 12,
+    },
     {
       logo: ticketmasterLogo,
       brand: "Ticketmaster",
@@ -92,9 +104,9 @@ const Index = () => {
     if (!searchQuery.trim()) return brands;
 
     return brands.filter(
-      (brand) =>
-        brand.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        brand.offer.toLowerCase().includes(searchQuery.toLowerCase())
+      (b) =>
+        b.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.offer.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [searchQuery, brands]);
 
@@ -106,6 +118,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-[#1a1c24]">
       <VoucherHeader />
+
       <div className="pb-8">
         <SearchBar searchQuery={searchQuery} onSearchChange={handleSearchChange} />
       </div>
@@ -115,7 +128,7 @@ const Index = () => {
           {filteredBrands.length > 0 ? (
             filteredBrands.map((brand, index) => (
               <BrandCard
-                key={index}
+                key={`${brand.brand}-${index}`}
                 logo={brand.logo}
                 brand={brand.brand}
                 offer={brand.offer}
