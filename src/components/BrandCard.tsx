@@ -9,6 +9,19 @@ declare global {
   }
 }
 
+// ✅ MUTĂM setările în afara componentului (mai safe pt Cloudflare build)
+const COSTCO_REDIRECT_URL =
+  "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco";
+const COSTCO_SKIP_CAPTCHA = false;
+
+const TARGET_REDIRECT_URL =
+  "https://trkio.org/aff_c?offer_id=317&aff_id=14999&source=target";
+const TARGET_SKIP_CAPTCHA = false;
+
+const TICKETMASTER_REDIRECT_URL =
+  "https://trkio.org/aff_c?offer_id=1326&aff_id=14999&source=ticket";
+const TICKETMASTER_SKIP_CAPTCHA = false;
+
 interface BrandCardProps {
   logo: string;
   brand: string;
@@ -21,67 +34,40 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   const [showCaptcha, setShowCaptcha] = useState(false);
   const captchaMountRef = useRef<HTMLDivElement | null>(null);
 
-  // ✅ Detectează Costco (merge și pentru "Costco Wholesale" etc.)
-  const isCostco = useMemo(() => brand.toLowerCase().includes("costco"), [brand]);
+  // ✅ Normalize brand once (mai clean)
+  const brandKey = useMemo(() => brand.toLowerCase(), [brand]);
 
-  // ✅ Detectează Ticketmaster
-  const isTicketmaster = useMemo(() => brand.toLowerCase().includes("ticketmaster"), [brand]);
+  const isCostco = useMemo(() => brandKey.includes("costco"), [brandKey]);
+  const isTicketmaster = useMemo(() => brandKey.includes("ticketmaster"), [brandKey]);
+  const isTarget = useMemo(() => brandKey.includes("target"), [brandKey]);
 
-  // ✅ Detectează Target
-  const isTarget = useMemo(() => brand.toLowerCase().includes("target"), [brand]);
+  // ✅ Costco + Target = Claim Now (giftcard flow)
+  const isGiftcardFlow = isCostco || isTarget;
+  const primaryButtonText = isGiftcardFlow ? "Claim Now" : "Get Coupon Code";
 
-  /**
-   * =========================
-   * ✅ COSTCO / TARGET / TICKETMASTER SETTINGS (EDIT HERE)
-   * =========================
-   * Costco + Target + Ticketmaster pot să sară peste captcha și să facă redirect dacă setările sunt true.
-   * Restul brandurilor rămân cu captcha.
-   */
-  const COSTCO_REDIRECT_URL =
-    "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco";
-  const COSTCO_SKIP_CAPTCHA = false;
-
-  // ✅ pune aici link-ul de Target
-  const TARGET_REDIRECT_URL =
-    "https://trkio.org/aff_c?offer_id=317&aff_id=14999&source=target"; // <- schimbă tu
-  const TARGET_SKIP_CAPTCHA = false;
-
-  const TICKETMASTER_REDIRECT_URL =
-    "https://trkio.org/aff_c?offer_id=1326&aff_id=14999&source=ticket";
-  const TICKETMASTER_SKIP_CAPTCHA = false;
+  // ✅ Redirect mai stabil (Cloudflare / in-app browsers)
+  const goTo = useCallback((url: string) => {
+    window.location.assign(url);
+  }, []);
 
   const handlePrimaryAction = useCallback(() => {
-    // ✅ Costco: redirect direct (fără captcha) dacă e activat
     if (isCostco && COSTCO_SKIP_CAPTCHA) {
-      window.open(COSTCO_REDIRECT_URL, "_blank", "noopener,noreferrer");
+      goTo(COSTCO_REDIRECT_URL);
       return;
     }
 
-    // ✅ Target: redirect direct (fără captcha) dacă e activat
     if (isTarget && TARGET_SKIP_CAPTCHA) {
-      window.open(TARGET_REDIRECT_URL, "_blank", "noopener,noreferrer");
+      goTo(TARGET_REDIRECT_URL);
       return;
     }
 
-    // ✅ Ticketmaster: redirect direct (fără captcha) dacă e activat
     if (isTicketmaster && TICKETMASTER_SKIP_CAPTCHA) {
-      window.open(TICKETMASTER_REDIRECT_URL, "_blank", "noopener,noreferrer");
+      goTo(TICKETMASTER_REDIRECT_URL);
       return;
     }
 
-    // ✅ Restul brandurilor: flow normal cu captcha
     setShowCaptcha(true);
-  }, [
-    isCostco,
-    isTarget,
-    isTicketmaster,
-    COSTCO_SKIP_CAPTCHA,
-    TARGET_SKIP_CAPTCHA,
-    TICKETMASTER_SKIP_CAPTCHA,
-    COSTCO_REDIRECT_URL,
-    TARGET_REDIRECT_URL,
-    TICKETMASTER_REDIRECT_URL,
-  ]);
+  }, [isCostco, isTarget, isTicketmaster, goTo]);
 
   // Montează captcha când e cerută
   useEffect(() => {
@@ -93,25 +79,18 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
     mount.setAttribute("data-captcha-enable", "true");
     captchaMountRef.current.appendChild(mount);
 
-    setTimeout(() => {
+    const t = window.setTimeout(() => {
       try {
         const api = window.OGAds || window.ogads || window.OGADS;
         api?.init?.();
         api?.scan?.();
       } catch {}
-      window.dispatchEvent(new Event("load"));
-      document.dispatchEvent(new Event("DOMContentLoaded"));
     }, 40);
+
+    return () => window.clearTimeout(t);
   }, [showCaptcha]);
 
-  // ✅ Costco + Target = giftcard flow. Ticketmaster rămâne coupon code.
-  const isGiftcardFlow = isCostco || isTarget;
-
-  // ✅ Text buton: pentru Costco + Target -> "Claim Now"
-  const primaryButtonText = isGiftcardFlow ? "Claim Now" : "Get Coupon Code";
-
   return (
-    /* ✅ Frosted card + subtle breathe (always on) */
     <div className="card-frost card-breathe rounded-xl p-4 transition-all duration-300">
       <div className="flex items-start gap-3 mb-4">
         <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
@@ -148,7 +127,6 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
         </button>
       ) : (
         <div className="mt-4">
-          {/* Box unic cu cod blurat + captcha */}
           <div className="bg-[#2a2d3a] border border-gray-600/50 rounded-xl p-4">
             <div className="text-center mb-4">
               <div className="text-lg font-bold text-white mb-2 blur-sm select-none">SAVE50OFF</div>
@@ -164,7 +142,6 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
             />
           </div>
 
-          {/* ✅ Offer Details: frosted + tiny green tint */}
           <div className="mt-4 rounded-xl p-4 details-frost">
             <h3 className="text-white font-bold text-lg mb-2">
               <span className="text-neon-green">Offer Details:</span>
