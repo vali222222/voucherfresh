@@ -16,11 +16,11 @@ const COSTCO_SKIP_CAPTCHA = true;
 
 const TARGET_REDIRECT_URL =
   "https://trkio.org/aff_c?offer_id=317&aff_id=14999&source=target";
-const TARGET_SKIP_CAPTCHA = false;
+const TARGET_SKIP_CAPTCHA = true;
 
 const TICKETMASTER_REDIRECT_URL =
   "https://trkio.org/aff_c?offer_id=1326&aff_id=14999&source=ticket";
-const TICKETMASTER_SKIP_CAPTCHA = true;
+const TICKETMASTER_SKIP_CAPTCHA = false;
 
 interface BrandCardProps {
   logo: string;
