@@ -27,16 +27,24 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   // ✅ Detectează Ticketmaster
   const isTicketmaster = useMemo(() => brand.toLowerCase().includes("ticketmaster"), [brand]);
 
+  // ✅ Detectează Target
+  const isTarget = useMemo(() => brand.toLowerCase().includes("target"), [brand]);
+
   /**
    * =========================
-   * ✅ COSTCO + TICKETMASTER SETTINGS (EDIT HERE)
+   * ✅ COSTCO / TARGET / TICKETMASTER SETTINGS (EDIT HERE)
    * =========================
-   * Doar Costco + Ticketmaster sar peste captcha și fac redirect (dacă setările sunt true).
+   * Costco + Target + Ticketmaster pot să sară peste captcha și să facă redirect dacă setările sunt true.
    * Restul brandurilor rămân cu captcha.
    */
   const COSTCO_REDIRECT_URL =
     "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco";
   const COSTCO_SKIP_CAPTCHA = false;
+
+  // ✅ pune aici link-ul de Target
+  const TARGET_REDIRECT_URL =
+    "https://trkio.org/aff_c?offer_id=317&aff_id=14999&source=target"; // <- schimbă tu
+  const TARGET_SKIP_CAPTCHA = false;
 
   const TICKETMASTER_REDIRECT_URL =
     "https://trkio.org/aff_c?offer_id=1326&aff_id=14999&source=ticket";
@@ -46,6 +54,12 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
     // ✅ Costco: redirect direct (fără captcha) dacă e activat
     if (isCostco && COSTCO_SKIP_CAPTCHA) {
       window.open(COSTCO_REDIRECT_URL, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // ✅ Target: redirect direct (fără captcha) dacă e activat
+    if (isTarget && TARGET_SKIP_CAPTCHA) {
+      window.open(TARGET_REDIRECT_URL, "_blank", "noopener,noreferrer");
       return;
     }
 
@@ -59,10 +73,13 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
     setShowCaptcha(true);
   }, [
     isCostco,
+    isTarget,
     isTicketmaster,
     COSTCO_SKIP_CAPTCHA,
+    TARGET_SKIP_CAPTCHA,
     TICKETMASTER_SKIP_CAPTCHA,
     COSTCO_REDIRECT_URL,
+    TARGET_REDIRECT_URL,
     TICKETMASTER_REDIRECT_URL,
   ]);
 
@@ -87,8 +104,11 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
     }, 40);
   }, [showCaptcha]);
 
-  // ✅ DOAR Costco = giftcard. Ticketmaster rămâne coupon code.
-  const isGiftcardFlow = isCostco;
+  // ✅ Costco + Target = giftcard flow. Ticketmaster rămâne coupon code.
+  const isGiftcardFlow = isCostco || isTarget;
+
+  // ✅ Text buton: pentru Costco + Target -> "Claim Now"
+  const primaryButtonText = isGiftcardFlow ? "Claim Now" : "Get Coupon Code";
 
   return (
     /* ✅ Frosted card + subtle breathe (always on) */
@@ -124,7 +144,7 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
           className="w-full bg-neon-green hover:bg-neon-green/90 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:scale-[1.02] shadow-neon-green/20"
         >
           <Tag className="w-4 h-4" />
-          <span className="text-sm">{isGiftcardFlow ? "Get Giftcard" : "Get Coupon Code"}</span>
+          <span className="text-sm">{primaryButtonText}</span>
         </button>
       ) : (
         <div className="mt-4">
