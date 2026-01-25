@@ -45,7 +45,7 @@ const Index = () => {
     {
       logo: targetLogo,
       brand: "Target",
-      offer: "🎯 Mega deal — Up to 85% Off",
+      offer: "🎯 $500 Giftcard",
       usedToday: 260,
       timeLeft: 12,
     },
