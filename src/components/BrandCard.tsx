@@ -9,23 +9,54 @@ declare global {
   }
 }
 
-// ✅ MUTĂM setările în afara componentului
+/** ===== OGAds / Captcha script ===== */
+const OGADS_SCRIPT_SRC = "https://lockedpage1.website/cp/js/n00dp";
+
+let ogadsScriptPromise: Promise<void> | null = null;
+
+function loadOgadsScriptOnce() {
+  if (typeof window === "undefined") return Promise.resolve();
+
+  // dacă API-ul există deja, nu mai încărcăm nimic
+  if (window.OGAds || window.ogads || window.OGADS) return Promise.resolve();
+
+  // dacă e deja în curs de încărcare, refolosim promisiunea
+  if (ogadsScriptPromise) return ogadsScriptPromise;
+
+  ogadsScriptPromise = new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector(`script[src="${OGADS_SCRIPT_SRC}"]`);
+    if (existing) {
+      resolve();
+      return;
+    }
+
+    const s = document.createElement("script");
+    s.src = OGADS_SCRIPT_SRC;
+    s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error("OGAds script failed to load"));
+    document.head.appendChild(s);
+  });
+
+  return ogadsScriptPromise;
+}
+
+/** ===== Redirect settings (outside component) ===== */
 const COSTCO_REDIRECT_URL =
   "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco";
-const COSTCO_SKIP_CAPTCHA = true;
-
 const TARGET_REDIRECT_URL =
   "https://trkio.org/aff_c?offer_id=317&aff_id=14999&source=target";
-const TARGET_SKIP_CAPTCHA = true;
 
-const TICKETMASTER_REDIRECT_URL =
-  "https://trkio.org/aff_c?offer_id=1326&aff_id=14999&source=ticket";
-const TICKETMASTER_SKIP_CAPTCHA = false;
-
-// ✅ NEW: DoorDash redirect + skip captcha
+// 🔁 Pune aici linkul tău real DoorDash (offer_id corect)
 const DOORDASH_REDIRECT_URL =
-  "https://glctrk.org/aff_c?offer_id=455&aff_id=14999&source=doordash";
-const DOORDASH_SKIP_CAPTCHA = true;
+  "https://trkio.org/aff_c?offer_id=XXXX&aff_id=14999&source=doordash";
+
+// Dacă vrei vreodată “Claim Now” și pe alt brand, îl adaugi aici:
+const CLAIM_NOW_REDIRECTS: Record<string, string> = {
+  costco: COSTCO_REDIRECT_URL,
+  target: TARGET_REDIRECT_URL,
+  doordash: DOORDASH_REDIRECT_URL,
+};
 
 interface BrandCardProps {
   logo: string;
@@ -39,66 +70,69 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   const [showCaptcha, setShowCaptcha] = useState(false);
   const captchaMountRef = useRef<HTMLDivElement | null>(null);
 
-  const brandKey = useMemo(() => brand.toLowerCase(), [brand]);
+  // normalize once
+  const brandKey = useMemo(() => brand.toLowerCase().trim(), [brand]);
 
-  const isCostco = useMemo(() => brandKey.includes("costco"), [brandKey]);
-  const isTicketmaster = useMemo(() => brandKey.includes("ticketmaster"), [brandKey]);
-  const isTarget = useMemo(() => brandKey.includes("target"), [brandKey]);
+  // “Claim Now” brands = cele care au redirect direct în map
+  const claimNowUrl = useMemo(() => {
+    // caută după cheie exactă sau “includes” (mai iertător)
+    for (const k of Object.keys(CLAIM_NOW_REDIRECTS)) {
+      if (brandKey.includes(k)) return CLAIM_NOW_REDIRECTS[k];
+    }
+    return "";
+  }, [brandKey]);
 
-  // ✅ NEW: DoorDash detection
-  const isDoorDash = useMemo(() => brandKey.includes("doordash"), [brandKey]);
-
-  // ✅ Costco + Target + DoorDash = Claim Now (no captcha flow)
-  const isGiftcardFlow = isCostco || isTarget || isDoorDash;
-  const primaryButtonText = isGiftcardFlow ? "Claim Now" : "Get Coupon Code";
+  const isClaimNowFlow = !!claimNowUrl;
+  const primaryButtonText = isClaimNowFlow ? "Claim Now" : "Get Coupon Code";
 
   const goTo = useCallback((url: string) => {
     window.location.assign(url);
   }, []);
 
   const handlePrimaryAction = useCallback(() => {
-    if (isCostco && COSTCO_SKIP_CAPTCHA) {
-      goTo(COSTCO_REDIRECT_URL);
+    // ✅ RULE #1: Claim Now => redirect direct, fără captcha
+    if (isClaimNowFlow && claimNowUrl) {
+      goTo(claimNowUrl);
       return;
     }
 
-    if (isTarget && TARGET_SKIP_CAPTCHA) {
-      goTo(TARGET_REDIRECT_URL);
-      return;
-    }
-
-    // ✅ NEW: DoorDash direct redirect, no captcha
-    if (isDoorDash && DOORDASH_SKIP_CAPTCHA) {
-      goTo(DOORDASH_REDIRECT_URL);
-      return;
-    }
-
-    if (isTicketmaster && TICKETMASTER_SKIP_CAPTCHA) {
-      goTo(TICKETMASTER_REDIRECT_URL);
-      return;
-    }
-
+    // ✅ RULE #2: Get Coupon Code => captcha
     setShowCaptcha(true);
-  }, [isCostco, isTarget, isDoorDash, isTicketmaster, goTo]);
+  }, [isClaimNowFlow, claimNowUrl, goTo]);
 
+  // Montează captcha când e cerută
   useEffect(() => {
     if (!showCaptcha || !captchaMountRef.current) return;
 
-    captchaMountRef.current.innerHTML = "";
+    const container = captchaMountRef.current;
+    container.innerHTML = "";
 
-    const mount = document.createElement("div");
-    mount.setAttribute("data-captcha-enable", "true");
-    captchaMountRef.current.appendChild(mount);
+    // multe integrări OGAds “scanează” containerul cu atributul ăsta
+    container.setAttribute("data-captcha-enable", "true");
 
-    const t = window.setTimeout(() => {
+    let cancelled = false;
+
+    (async () => {
       try {
-        const api = window.OGAds || window.ogads || window.OGADS;
-        api?.init?.();
-        api?.scan?.();
-      } catch {}
-    }, 40);
+        await loadOgadsScriptOnce();
+        if (cancelled) return;
 
-    return () => window.clearTimeout(t);
+        window.setTimeout(() => {
+          try {
+            const api = window.OGAds || window.ogads || window.OGADS;
+            api?.init?.();
+            api?.scan?.();
+          } catch {}
+        }, 50);
+      } catch (e) {
+        // fallback: dacă scriptul e blocat de CSP / adblock, măcar să știi
+        console.error(e);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [showCaptcha]);
 
   return (
