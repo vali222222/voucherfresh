@@ -17,10 +17,7 @@ let ogadsScriptPromise: Promise<void> | null = null;
 function loadOgadsScriptOnce() {
   if (typeof window === "undefined") return Promise.resolve();
 
-  // dacă API-ul există deja, nu mai încărcăm nimic
   if (window.OGAds || window.ogads || window.OGADS) return Promise.resolve();
-
-  // dacă e deja în curs de încărcare, refolosim promisiunea
   if (ogadsScriptPromise) return ogadsScriptPromise;
 
   ogadsScriptPromise = new Promise<void>((resolve, reject) => {
@@ -47,11 +44,14 @@ const COSTCO_REDIRECT_URL =
 const TARGET_REDIRECT_URL =
   "https://trkio.org/aff_c?offer_id=317&aff_id=14999&source=target";
 
-// 🔁 Pune aici linkul tău real DoorDash (offer_id corect)
+// 🔁 înlocuiește cu linkul tău real
 const DOORDASH_REDIRECT_URL =
   "https://trkio.org/aff_c?offer_id=XXXX&aff_id=14999&source=doordash";
 
-// Dacă vrei vreodată “Claim Now” și pe alt brand, îl adaugi aici:
+/**
+ * Tot ce e aici va avea CTA "Claim Now" + redirect direct.
+ * Restul => "Get Coupon Code" + captcha.
+ */
 const CLAIM_NOW_REDIRECTS: Record<string, string> = {
   costco: COSTCO_REDIRECT_URL,
   target: TARGET_REDIRECT_URL,
@@ -68,14 +68,15 @@ interface BrandCardProps {
 
 export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCardProps) => {
   const [showCaptcha, setShowCaptcha] = useState(false);
+
+  // 🔥 asta forțează re-mount + re-scan de fiecare dată când apeși Get Coupon
+  const [captchaNonce, setCaptchaNonce] = useState(0);
+
   const captchaMountRef = useRef<HTMLDivElement | null>(null);
 
-  // normalize once
   const brandKey = useMemo(() => brand.toLowerCase().trim(), [brand]);
 
-  // “Claim Now” brands = cele care au redirect direct în map
   const claimNowUrl = useMemo(() => {
-    // caută după cheie exactă sau “includes” (mai iertător)
     for (const k of Object.keys(CLAIM_NOW_REDIRECTS)) {
       if (brandKey.includes(k)) return CLAIM_NOW_REDIRECTS[k];
     }
@@ -90,24 +91,32 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   }, []);
 
   const handlePrimaryAction = useCallback(() => {
-    // ✅ RULE #1: Claim Now => redirect direct, fără captcha
+    // ✅ Claim Now => direct link
     if (isClaimNowFlow && claimNowUrl) {
       goTo(claimNowUrl);
       return;
     }
 
-    // ✅ RULE #2: Get Coupon Code => captcha
+    // ✅ Get Coupon Code => de fiecare dată: deschide + retriggerează captcha
     setShowCaptcha(true);
+    setCaptchaNonce((n) => n + 1);
   }, [isClaimNowFlow, claimNowUrl, goTo]);
 
-  // Montează captcha când e cerută
+  /**
+   * Montăm captcha:
+   * - rulează la showCaptcha
+   * - rulează iar la fiecare click Get Coupon (captchaNonce se schimbă)
+   */
   useEffect(() => {
     if (!showCaptcha || !captchaMountRef.current) return;
 
     const container = captchaMountRef.current;
-    container.innerHTML = "";
 
-    // multe integrări OGAds “scanează” containerul cu atributul ăsta
+    // curățăm complet ca să nu rămână “resturi” de la scan-ul anterior
+    container.innerHTML = "";
+    container.removeAttribute("data-captcha-enable");
+
+    // OGAds scanează după atributul ăsta
     container.setAttribute("data-captcha-enable", "true");
 
     let cancelled = false;
@@ -117,15 +126,17 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
         await loadOgadsScriptOnce();
         if (cancelled) return;
 
+        // mic delay ca DOM-ul să fie stabil
         window.setTimeout(() => {
           try {
             const api = window.OGAds || window.ogads || window.OGADS;
+
+            // unele builduri au nevoie de init înainte de scan la fiecare mount
             api?.init?.();
             api?.scan?.();
           } catch {}
-        }, 50);
+        }, 60);
       } catch (e) {
-        // fallback: dacă scriptul e blocat de CSP / adblock, măcar să știi
         console.error(e);
       }
     })();
@@ -133,7 +144,7 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
     return () => {
       cancelled = true;
     };
-  }, [showCaptcha]);
+  }, [showCaptcha, captchaNonce]);
 
   return (
     <div className="card-frost card-breathe rounded-xl p-4 transition-all duration-300">
@@ -162,15 +173,17 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
         </div>
       </div>
 
-      {!showCaptcha ? (
-        <button
-          onClick={handlePrimaryAction}
-          className="w-full bg-neon-green hover:bg-neon-green/90 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:scale-[1.02] shadow-neon-green/20"
-        >
-          <Tag className="w-4 h-4" />
-          <span className="text-sm">{primaryButtonText}</span>
-        </button>
-      ) : (
+      {/* Butonul rămâne disponibil și când captcha e deschisă,
+          ca să poți apăsa iar Get Coupon și să reîncarce captcha */}
+      <button
+        onClick={handlePrimaryAction}
+        className="w-full bg-neon-green hover:bg-neon-green/90 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:scale-[1.02] shadow-neon-green/20"
+      >
+        <Tag className="w-4 h-4" />
+        <span className="text-sm">{primaryButtonText}</span>
+      </button>
+
+      {showCaptcha && !isClaimNowFlow && (
         <div className="mt-4">
           <div className="bg-[#2a2d3a] border border-gray-600/50 rounded-xl p-4">
             <div className="text-center mb-4">
@@ -181,6 +194,8 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
             </div>
 
             <div
+              // key forțează re-mount DOM când nonce se schimbă
+              key={`captcha-${brandKey}-${captchaNonce}`}
               ref={captchaMountRef}
               className="w-full min-h-[80px] max-h-[100px] pointer-events-auto bg-[#1a1c24] rounded-xl border border-gray-600/50 overflow-hidden"
               style={{ position: "relative" }}
