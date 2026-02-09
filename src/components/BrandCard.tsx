@@ -1,56 +1,23 @@
 import { Tag, Users, Clock } from "lucide-react";
-import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-
-declare global {
-  interface Window {
-    OGAds?: any;
-    ogads?: any;
-    OGADS?: any;
-  }
-}
-
-/** ===== OGAds / Captcha script ===== */
-const OGADS_SCRIPT_SRC = "https://lockedpage1.website/cp/js/n00dp";
-
-let ogadsScriptPromise: Promise<void> | null = null;
-
-function loadOgadsScriptOnce() {
-  if (typeof window === "undefined") return Promise.resolve();
-
-  if (window.OGAds || window.ogads || window.OGADS) return Promise.resolve();
-  if (ogadsScriptPromise) return ogadsScriptPromise;
-
-  ogadsScriptPromise = new Promise<void>((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${OGADS_SCRIPT_SRC}"]`);
-    if (existing) {
-      resolve();
-      return;
-    }
-
-    const s = document.createElement("script");
-    s.src = OGADS_SCRIPT_SRC;
-    s.async = true;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error("OGAds script failed to load"));
-    document.head.appendChild(s);
-  });
-
-  return ogadsScriptPromise;
-}
+import { useState, useMemo, useCallback } from "react";
 
 /** ===== Redirect settings (outside component) ===== */
 const COSTCO_REDIRECT_URL =
   "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco";
+
 const TARGET_REDIRECT_URL =
   "https://trkio.org/aff_c?offer_id=317&aff_id=14999&source=target";
 
-// 🔁 înlocuiește cu linkul tău real
+// ✅ pune aici linkul tău real DoorDash (offer_id corect)
 const DOORDASH_REDIRECT_URL =
   "https://trkio.org/aff_c?offer_id=XXXX&aff_id=14999&source=doordash";
 
 /**
- * Tot ce e aici va avea CTA "Claim Now" + redirect direct.
- * Restul => "Get Coupon Code" + captcha.
+ * Orice brand care apare aici va avea:
+ * - CTA: Claim Now
+ * - Click: redirect direct (fără captcha)
+ *
+ * Restul brandurilor => CTA: Get Coupon Code + captcha
  */
 const CLAIM_NOW_REDIRECTS: Record<string, string> = {
   costco: COSTCO_REDIRECT_URL,
@@ -69,14 +36,13 @@ interface BrandCardProps {
 export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCardProps) => {
   const [showCaptcha, setShowCaptcha] = useState(false);
 
-  // 🔥 asta forțează re-mount + re-scan de fiecare dată când apeși Get Coupon
+  // 🔁 crește la fiecare click pe Get Coupon Code ca să remonteze containerul
   const [captchaNonce, setCaptchaNonce] = useState(0);
-
-  const captchaMountRef = useRef<HTMLDivElement | null>(null);
 
   const brandKey = useMemo(() => brand.toLowerCase().trim(), [brand]);
 
   const claimNowUrl = useMemo(() => {
+    // match tolerant: dacă brandKey include cheia din map
     for (const k of Object.keys(CLAIM_NOW_REDIRECTS)) {
       if (brandKey.includes(k)) return CLAIM_NOW_REDIRECTS[k];
     }
@@ -97,54 +63,10 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
       return;
     }
 
-    // ✅ Get Coupon Code => de fiecare dată: deschide + retriggerează captcha
+    // ✅ Get Coupon Code => captcha de fiecare dată
     setShowCaptcha(true);
     setCaptchaNonce((n) => n + 1);
   }, [isClaimNowFlow, claimNowUrl, goTo]);
-
-  /**
-   * Montăm captcha:
-   * - rulează la showCaptcha
-   * - rulează iar la fiecare click Get Coupon (captchaNonce se schimbă)
-   */
-  useEffect(() => {
-    if (!showCaptcha || !captchaMountRef.current) return;
-
-    const container = captchaMountRef.current;
-
-    // curățăm complet ca să nu rămână “resturi” de la scan-ul anterior
-    container.innerHTML = "";
-    container.removeAttribute("data-captcha-enable");
-
-    // OGAds scanează după atributul ăsta
-    container.setAttribute("data-captcha-enable", "true");
-
-    let cancelled = false;
-
-    (async () => {
-      try {
-        await loadOgadsScriptOnce();
-        if (cancelled) return;
-
-        // mic delay ca DOM-ul să fie stabil
-        window.setTimeout(() => {
-          try {
-            const api = window.OGAds || window.ogads || window.OGADS;
-
-            // unele builduri au nevoie de init înainte de scan la fiecare mount
-            api?.init?.();
-            api?.scan?.();
-          } catch {}
-        }, 60);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [showCaptcha, captchaNonce]);
 
   return (
     <div className="card-frost card-breathe rounded-xl p-4 transition-all duration-300">
@@ -173,8 +95,7 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
         </div>
       </div>
 
-      {/* Butonul rămâne disponibil și când captcha e deschisă,
-          ca să poți apăsa iar Get Coupon și să reîncarce captcha */}
+      {/* Butonul principal */}
       <button
         onClick={handlePrimaryAction}
         className="w-full bg-neon-green hover:bg-neon-green/90 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:scale-[1.02] shadow-neon-green/20"
@@ -183,6 +104,7 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
         <span className="text-sm">{primaryButtonText}</span>
       </button>
 
+      {/* ✅ Captcha doar pentru Get Coupon Code */}
       {showCaptcha && !isClaimNowFlow && (
         <div className="mt-4">
           <div className="bg-[#2a2d3a] border border-gray-600/50 rounded-xl p-4">
@@ -193,10 +115,11 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
               </p>
             </div>
 
+            {/* ✅ Step Two: Include HTML (exact) */}
+            {/* key => forțează remount la fiecare click */}
             <div
-              // key forțează re-mount DOM când nonce se schimbă
               key={`captcha-${brandKey}-${captchaNonce}`}
-              ref={captchaMountRef}
+              data-captcha-enable="true"
               className="w-full min-h-[80px] max-h-[100px] pointer-events-auto bg-[#1a1c24] rounded-xl border border-gray-600/50 overflow-hidden"
               style={{ position: "relative" }}
             />
