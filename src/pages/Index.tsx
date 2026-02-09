@@ -24,14 +24,14 @@ const Index = () => {
 
   useEffect(() => {
     const criticalImages = [
-      targetLogo, // ✅ Target primul
-      ticketmasterLogo, // ✅ Ticketmaster al doilea
-      crumblcookieLogo,
+      doordashLogo, // ✅ DoorDash primul
+      crumblcookieLogo, // ✅ Crumbl al doilea
       appleLogo,
-      doordashLogo,
       sephoraLogo,
       costcoLogo,
       zaraLogo,
+      targetLogo, // ✅ astea mutate spre final
+      ticketmasterLogo,
     ];
     preloadImages(criticalImages);
   }, []);
@@ -40,8 +40,51 @@ const Index = () => {
     setSearchQuery(query);
   }, []);
 
-  // ✅ Target #1, Ticketmaster #2
+  // ✅ DoorDash #1, Crumbl #2, Target/Ticketmaster spre final
   const brands = [
+    {
+      logo: doordashLogo,
+      brand: "DoorDash",
+      offer: "🍔 $500 Giftcard",
+      usedToday: 167,
+      timeLeft: 14,
+    },
+    {
+      logo: crumblcookieLogo,
+      brand: "Crumbl Cookies",
+      offer: "🍪 Sweet deal — Up to 90% Off",
+      usedToday: 324,
+      timeLeft: 9,
+    },
+    {
+      logo: appleLogo,
+      brand: "Apple",
+      offer: "⚡ Exclusive offer — Up to 95% Off",
+      usedToday: 198,
+      timeLeft: 23,
+    },
+    {
+      logo: sephoraLogo,
+      brand: "Sephora",
+      offer: "💄 Beauty picks — Up to 60% Off",
+      usedToday: 209,
+      timeLeft: 18,
+    },
+    {
+      logo: costcoLogo,
+      brand: "Costco",
+      offer: "🎟️ $750 Giftcard",
+      usedToday: 185,
+      timeLeft: 8,
+    },
+    {
+      logo: zaraLogo,
+      brand: "Zara",
+      offer: "🛍️ Style drop — Up to 70% Off",
+      usedToday: 246,
+      timeLeft: 11,
+    },
+    // ✅ cele care erau sus, mutate spre final
     {
       logo: targetLogo,
       brand: "Target",
@@ -54,48 +97,6 @@ const Index = () => {
       brand: "Ticketmaster",
       offer: "🔥 Ticket deal — Up to 90% Off",
       usedToday: 210,
-      timeLeft: 11,
-    },
-    {
-      logo: costcoLogo,
-      brand: "Costco",
-      offer: "🎟️ $750 Giftcard",
-      usedToday: 185,
-      timeLeft: 8,
-    },
-    {
-      logo: appleLogo,
-      brand: "Apple",
-      offer: "⚡ Exclusive offer — Up to 95% Off",
-      usedToday: 198,
-      timeLeft: 23,
-    },
-    {
-      logo: doordashLogo,
-      brand: "DoorDash",
-      offer: "🍔 Hot deal — Up to 90% Off",
-      usedToday: 167,
-      timeLeft: 14,
-    },
-    {
-      logo: crumblcookieLogo,
-      brand: "Crumbl Cookies",
-      offer: "🍪 Sweet deal — Up to 90% Off",
-      usedToday: 324,
-      timeLeft: 9,
-    },
-    {
-      logo: sephoraLogo,
-      brand: "Sephora",
-      offer: "💄 Beauty picks — Up to 60% Off",
-      usedToday: 209,
-      timeLeft: 18,
-    },
-    {
-      logo: zaraLogo,
-      brand: "Zara",
-      offer: "🛍️ Style drop — Up to 70% Off",
-      usedToday: 246,
       timeLeft: 11,
     },
   ];
