@@ -1,24 +1,25 @@
 import { Tag, Users, Clock } from "lucide-react";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 
-/** ===== Redirect settings (outside component) ===== */
+declare global {
+  interface Window {
+    OGAds?: any;
+    ogads?: any;
+    OGADS?: any;
+  }
+}
+
+/** Redirects (Claim Now) */
 const COSTCO_REDIRECT_URL =
   "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco";
-
 const TARGET_REDIRECT_URL =
   "https://trkio.org/aff_c?offer_id=317&aff_id=14999&source=target";
 
-// ✅ pune aici linkul tău real DoorDash (offer_id corect)
+// Pune linkul real:
 const DOORDASH_REDIRECT_URL =
   "https://trkio.org/aff_c?offer_id=XXXX&aff_id=14999&source=doordash";
 
-/**
- * Orice brand care apare aici va avea:
- * - CTA: Claim Now
- * - Click: redirect direct (fără captcha)
- *
- * Restul brandurilor => CTA: Get Coupon Code + captcha
- */
+/** Map pentru Claim Now => redirect direct */
 const CLAIM_NOW_REDIRECTS: Record<string, string> = {
   costco: COSTCO_REDIRECT_URL,
   target: TARGET_REDIRECT_URL,
@@ -35,14 +36,13 @@ interface BrandCardProps {
 
 export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCardProps) => {
   const [showCaptcha, setShowCaptcha] = useState(false);
-
-  // 🔁 crește la fiecare click pe Get Coupon Code ca să remonteze containerul
   const [captchaNonce, setCaptchaNonce] = useState(0);
+
+  const captchaHostRef = useRef<HTMLDivElement | null>(null);
 
   const brandKey = useMemo(() => brand.toLowerCase().trim(), [brand]);
 
   const claimNowUrl = useMemo(() => {
-    // match tolerant: dacă brandKey include cheia din map
     for (const k of Object.keys(CLAIM_NOW_REDIRECTS)) {
       if (brandKey.includes(k)) return CLAIM_NOW_REDIRECTS[k];
     }
@@ -57,16 +57,36 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   }, []);
 
   const handlePrimaryAction = useCallback(() => {
-    // ✅ Claim Now => direct link
+    // Claim Now => redirect direct
     if (isClaimNowFlow && claimNowUrl) {
       goTo(claimNowUrl);
       return;
     }
 
-    // ✅ Get Coupon Code => captcha de fiecare dată
+    // Get Coupon Code => arată captcha + forțează remount/re-init de fiecare dată
     setShowCaptcha(true);
     setCaptchaNonce((n) => n + 1);
   }, [isClaimNowFlow, claimNowUrl, goTo]);
+
+  // ✅ La fiecare click (captchaNonce), recreăm exact HTML-ul cerut și re-scanăm
+  useEffect(() => {
+    if (!showCaptcha || isClaimNowFlow) return;
+    if (!captchaHostRef.current) return;
+
+    // 1) recreează containerul exact cum cere providerul
+    captchaHostRef.current.innerHTML = `<div data-captcha-enable="true"></div>`;
+
+    // 2) încearcă să forțezi init/scan (dacă providerul expune API)
+    const t = window.setTimeout(() => {
+      try {
+        const api = window.OGAds || window.ogads || window.OGADS;
+        api?.init?.();
+        api?.scan?.();
+      } catch {}
+    }, 60);
+
+    return () => window.clearTimeout(t);
+  }, [showCaptcha, captchaNonce, isClaimNowFlow]);
 
   return (
     <div className="card-frost card-breathe rounded-xl p-4 transition-all duration-300">
@@ -95,7 +115,6 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
         </div>
       </div>
 
-      {/* Butonul principal */}
       <button
         onClick={handlePrimaryAction}
         className="w-full bg-neon-green hover:bg-neon-green/90 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:scale-[1.02] shadow-neon-green/20"
@@ -104,7 +123,6 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
         <span className="text-sm">{primaryButtonText}</span>
       </button>
 
-      {/* ✅ Captcha doar pentru Get Coupon Code */}
       {showCaptcha && !isClaimNowFlow && (
         <div className="mt-4">
           <div className="bg-[#2a2d3a] border border-gray-600/50 rounded-xl p-4">
@@ -115,24 +133,13 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
               </p>
             </div>
 
-            {/* ✅ Step Two: Include HTML (exact) */}
-            {/* key => forțează remount la fiecare click */}
+            {/* host în care injectăm EXACT div-ul cerut */}
             <div
-              key={`captcha-${brandKey}-${captchaNonce}`}
-              data-captcha-enable="true"
-              className="w-full min-h-[80px] max-h-[100px] pointer-events-auto bg-[#1a1c24] rounded-xl border border-gray-600/50 overflow-hidden"
+              key={`captcha-host-${brandKey}-${captchaNonce}`}
+              ref={captchaHostRef}
+              className="w-full min-h-[110px] pointer-events-auto bg-[#1a1c24] rounded-xl border border-gray-600/50 overflow-hidden"
               style={{ position: "relative" }}
             />
-          </div>
-
-          <div className="mt-4 rounded-xl p-4 details-frost">
-            <h3 className="text-white font-bold text-lg mb-2">
-              <span className="text-neon-green">Offer Details:</span>
-            </h3>
-            <p className="text-gray-200 text-sm leading-relaxed">
-              Apply this discount code when you checkout to get {offer.toLowerCase()} your {brand} purchase and
-              receive immediate savings on various products.
-            </p>
           </div>
         </div>
       )}
