@@ -9,7 +9,7 @@ declare global {
   }
 }
 
-// ✅ MUTĂM setările în afara componentului (mai safe pt Cloudflare build)
+// ✅ MUTĂM setările în afara componentului
 const COSTCO_REDIRECT_URL =
   "https://glctrk.org/aff_c?offer_id=941&aff_id=14999&source=costco";
 const COSTCO_SKIP_CAPTCHA = true;
@@ -21,6 +21,11 @@ const TARGET_SKIP_CAPTCHA = true;
 const TICKETMASTER_REDIRECT_URL =
   "https://trkio.org/aff_c?offer_id=1326&aff_id=14999&source=ticket";
 const TICKETMASTER_SKIP_CAPTCHA = false;
+
+// ✅ NEW: DoorDash redirect + skip captcha
+const DOORDASH_REDIRECT_URL =
+  "https://glctrk.org/aff_c?offer_id=455&aff_id=14999&source=doordash";
+const DOORDASH_SKIP_CAPTCHA = true;
 
 interface BrandCardProps {
   logo: string;
@@ -34,18 +39,19 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
   const [showCaptcha, setShowCaptcha] = useState(false);
   const captchaMountRef = useRef<HTMLDivElement | null>(null);
 
-  // ✅ Normalize brand once (mai clean)
   const brandKey = useMemo(() => brand.toLowerCase(), [brand]);
 
   const isCostco = useMemo(() => brandKey.includes("costco"), [brandKey]);
   const isTicketmaster = useMemo(() => brandKey.includes("ticketmaster"), [brandKey]);
   const isTarget = useMemo(() => brandKey.includes("target"), [brandKey]);
 
-  // ✅ Costco + Target = Claim Now (giftcard flow)
-  const isGiftcardFlow = isCostco || isTarget;
+  // ✅ NEW: DoorDash detection
+  const isDoorDash = useMemo(() => brandKey.includes("doordash"), [brandKey]);
+
+  // ✅ Costco + Target + DoorDash = Claim Now (no captcha flow)
+  const isGiftcardFlow = isCostco || isTarget || isDoorDash;
   const primaryButtonText = isGiftcardFlow ? "Claim Now" : "Get Coupon Code";
 
-  // ✅ Redirect mai stabil (Cloudflare / in-app browsers)
   const goTo = useCallback((url: string) => {
     window.location.assign(url);
   }, []);
@@ -61,15 +67,20 @@ export const BrandCard = ({ logo, brand, offer, usedToday, timeLeft }: BrandCard
       return;
     }
 
+    // ✅ NEW: DoorDash direct redirect, no captcha
+    if (isDoorDash && DOORDASH_SKIP_CAPTCHA) {
+      goTo(DOORDASH_REDIRECT_URL);
+      return;
+    }
+
     if (isTicketmaster && TICKETMASTER_SKIP_CAPTCHA) {
       goTo(TICKETMASTER_REDIRECT_URL);
       return;
     }
 
     setShowCaptcha(true);
-  }, [isCostco, isTarget, isTicketmaster, goTo]);
+  }, [isCostco, isTarget, isDoorDash, isTicketmaster, goTo]);
 
-  // Montează captcha când e cerută
   useEffect(() => {
     if (!showCaptcha || !captchaMountRef.current) return;
 
