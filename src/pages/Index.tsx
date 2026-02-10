@@ -1,3 +1,4 @@
+
 import { VoucherHeader } from "@/components/VoucherHeader";
 import { SearchBar } from "@/components/SearchBar";
 import { BrandCard } from "@/components/BrandCard";
@@ -13,25 +14,23 @@ import doordashLogo from "@/assets/doordash-logo.png";
 import sephoraLogo from "@/assets/sephora-logo.png";
 import costcoLogo from "@/assets/costco-logo.png";
 import zaraLogo from "@/assets/zara-logo.png";
-import ticketmasterLogo from "@/assets/ticketmaster-logo.png";
-
-// ✅ adaugi tu poza asta după ce o încarci (pune exact numele fișierului aici)
-import targetLogo from "@/assets/target-logo.png";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const isMobile = useIsMobile();
 
+  // Ticketmaster logo din /public ca sa nu crape build-ul
+  const ticketmasterLogo = "/ticketmaster-logo.png";
+
   useEffect(() => {
     const criticalImages = [
-      doordashLogo, // ✅ DoorDash primul
-      crumblcookieLogo, // ✅ Crumbl al doilea
+      ticketmasterLogo,
+      crumblcookieLogo,
       appleLogo,
+      doordashLogo,
       sephoraLogo,
       costcoLogo,
       zaraLogo,
-      targetLogo, // ✅ astea mutate spre final
-      ticketmasterLogo,
     ];
     preloadImages(criticalImages);
   }, []);
@@ -40,63 +39,55 @@ const Index = () => {
     setSearchQuery(query);
   }, []);
 
-  // ✅ DoorDash #1, Crumbl #2, Target/Ticketmaster spre final
+  // Ticketmaster primul, Costco al doilea, restul la fel
   const brands = [
+    {
+      logo: ticketmasterLogo,
+      brand: "Ticketmaster",
+      offer: "🎟️ Get coupon code",
+      usedToday: 210,
+      timeLeft: 12,
+    },
+    {
+      logo: costcoLogo,
+      brand: "Costco",
+      offer: "🔥 $750 Giftcard",
+      usedToday: 185,
+      timeLeft: 12,
+    },
+    {
+      logo: appleLogo,
+      brand: "Apple",
+      offer: "⚡ Exclusive offer — Up to 95% Off",
+      usedToday: 198,
+      timeLeft: 13,
+    },
     {
       logo: doordashLogo,
       brand: "DoorDash",
-      offer: "🍔 $500 Giftcard",
+      offer: "🍔 Hot deal — Up to 90% Off",
       usedToday: 167,
       timeLeft: 14,
     },
     {
       logo: crumblcookieLogo,
       brand: "Crumbl Cookies",
-      offer: "🍪 $750 Giftcard",
+      offer: "🍪 Sweet deal — Up to 90% Off",
       usedToday: 324,
       timeLeft: 9,
     },
     {
-      logo: appleLogo,
-      brand: "Apple",
-      offer: "⚡ $100 Giftcard",
-      usedToday: 198,
-      timeLeft: 23,
-    },
-    {
       logo: sephoraLogo,
       brand: "Sephora",
-      offer: "💄 $750 Giftcard",
+      offer: "💄 Beauty picks — Up to 60% Off",
       usedToday: 209,
       timeLeft: 18,
     },
     {
-      logo: costcoLogo,
-      brand: "Costco",
-      offer: "🎟️ $750 Giftcard",
-      usedToday: 185,
-      timeLeft: 8,
-    },
-    {
       logo: zaraLogo,
       brand: "Zara",
-      offer: "🛍️ $500 Giftcard",
+      offer: "🛍️ Style drop — Up to 70% Off",
       usedToday: 246,
-      timeLeft: 11,
-    },
-    // ✅ cele care erau sus, mutate spre final
-    {
-      logo: targetLogo,
-      brand: "Target",
-      offer: "🎯 $500 Giftcard",
-      usedToday: 260,
-      timeLeft: 12,
-    },
-    {
-      logo: ticketmasterLogo,
-      brand: "Ticketmaster",
-      offer: "🔥 Ticket deal — Up to 90% Off",
-      usedToday: 210,
       timeLeft: 11,
     },
   ];
@@ -105,9 +96,9 @@ const Index = () => {
     if (!searchQuery.trim()) return brands;
 
     return brands.filter(
-      (b) =>
-        b.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        b.offer.toLowerCase().includes(searchQuery.toLowerCase())
+      (brand) =>
+        brand.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        brand.offer.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [searchQuery, brands]);
 
@@ -119,7 +110,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-[#1a1c24]">
       <VoucherHeader />
-
       <div className="pb-8">
         <SearchBar searchQuery={searchQuery} onSearchChange={handleSearchChange} />
       </div>
@@ -129,7 +119,7 @@ const Index = () => {
           {filteredBrands.length > 0 ? (
             filteredBrands.map((brand, index) => (
               <BrandCard
-                key={`${brand.brand}-${index}`}
+                key={index}
                 logo={brand.logo}
                 brand={brand.brand}
                 offer={brand.offer}
