@@ -14,13 +14,11 @@ import doordashLogo from "@/assets/doordash-logo.png";
 import sephoraLogo from "@/assets/sephora-logo.png";
 import costcoLogo from "@/assets/costco-logo.png";
 import zaraLogo from "@/assets/zara-logo.png";
+import ticketmasterLogo = "/ticketmaster-logo.png"
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const isMobile = useIsMobile();
-
-  // Ticketmaster logo din /public ca sa nu crape build-ul
-  const ticketmasterLogo = "/ticketmaster-logo.png";
 
   useEffect(() => {
     const criticalImages = [
