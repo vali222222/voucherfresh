@@ -52,21 +52,21 @@ const Index = () => {
     {
       logo: crumblcookieLogo,
       brand: "Crumbl Cookies",
-      offer: "🍪 Sweet deal — Up to 90% Off",
+      offer: "🍪 $750 Giftcard",
       usedToday: 324,
       timeLeft: 9,
     },
     {
       logo: appleLogo,
       brand: "Apple",
-      offer: "⚡ Exclusive offer — Up to 95% Off",
+      offer: "⚡ $100 Giftcard",
       usedToday: 198,
       timeLeft: 23,
     },
     {
       logo: sephoraLogo,
       brand: "Sephora",
-      offer: "💄 Beauty picks — Up to 60% Off",
+      offer: "💄 $750 Giftcard",
       usedToday: 209,
       timeLeft: 18,
     },
@@ -80,7 +80,7 @@ const Index = () => {
     {
       logo: zaraLogo,
       brand: "Zara",
-      offer: "🛍️ Style drop — Up to 70% Off",
+      offer: "🛍️ $500 Giftcard",
       usedToday: 246,
       timeLeft: 11,
     },
