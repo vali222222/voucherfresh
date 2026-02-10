@@ -1,4 +1,3 @@
-
 import { VoucherHeader } from "@/components/VoucherHeader";
 import { SearchBar } from "@/components/SearchBar";
 import { BrandCard } from "@/components/BrandCard";
@@ -14,7 +13,6 @@ import doordashLogo from "@/assets/doordash-logo.png";
 import sephoraLogo from "@/assets/sephora-logo.png";
 import costcoLogo from "@/assets/costco-logo.png";
 import zaraLogo from "@/assets/zara-logo.png";
-import ticketmasterLogo = "/ticketmaster-logo.png"
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
